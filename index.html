@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraud Message Detector</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .container {
+            max-width: 600px;
+        }
+        .message-box {
+            min-height: 150px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <!-- Main Container -->
+    <div class="container bg-white rounded-2xl shadow-xl p-8 space-y-6 transform transition-all duration-300 hover:scale-105">
+        
+        <!-- Header Section -->
+        <header class="text-center space-y-2">
+            <h1 class="text-4xl font-bold text-gray-800">Fraud Detector</h1>
+            <p class="text-gray-500">Paste your message below to check if it's fraudulent.</p>
+        </header>
+
+        <!-- Input Area -->
+        <main class="space-y-4">
+            <textarea id="message-input" class="message-box w-full p-4 text-gray-700 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="e.g., 'Congratulations! You've won a free prize. Click here to claim.'" required></textarea>
+            <button id="check-button" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-xl shadow-md hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                Check Message
+            </button>
+        </main>
+
+        <!-- Result Display Section -->
+        <section id="result-section" class="text-center space-y-4 hidden">
+            <h2 class="text-2xl font-semibold" id="result-label"></h2>
+            <p class="text-gray-500" id="result-description"></p>
+        </section>
+
+    </div>
+
+    <script>
+        // Get references to all the necessary elements from the HTML document.
+        const messageInput = document.getElementById('message-input');
+        const checkButton = document.getElementById('check-button');
+        const resultSection = document.getElementById('result-section');
+        const resultLabel = document.getElementById('result-label');
+        const resultDescription = document.getElementById('result-description');
+
+        // This is a simple, keyword-based "model" to demonstrate the concept.
+        // A real application would send the message to a server with the actual Python model.
+        const FRAUD_KEYWORDS = ['congratulations', 'winner', 'free', 'claim', 'click here', 'prize', 'won', 'cash', 'money'];
+
+        /**
+         * Checks if a message contains any of the predefined fraudulent keywords.
+         * @param {string} message The text message to check.
+         * @returns {boolean} True if the message is fraudulent, false otherwise.
+         */
+        function isFraudulent(message) {
+            const lowerCaseMessage = message.toLowerCase();
+            return FRAUD_KEYWORDS.some(keyword => lowerCaseMessage.includes(keyword));
+        }
+
+        /**
+         * Handles the button click event to check the message.
+         */
+        function handleCheck() {
+            const message = messageInput.value.trim();
+            if (!message) {
+                // Show an alert if the input is empty.
+                alert('Please enter a message to check.');
+                return;
+            }
+
+            // Simulate a prediction delay for a more realistic feel.
+            resultSection.classList.add('hidden');
+            checkButton.textContent = 'Checking...';
+            checkButton.disabled = true;
+
+            setTimeout(() => {
+                const prediction = isFraudulent(message);
+                checkButton.textContent = 'Check Message';
+                checkButton.disabled = false;
+                displayResult(prediction);
+            }, 1000); // Wait for 1 second before showing the result.
+        }
+
+        /**
+         * Displays the prediction result in the UI.
+         * @param {boolean} isFraud True if the message is fraudulent, false otherwise.
+         */
+        function displayResult(isFraud) {
+            resultSection.classList.remove('hidden');
+            if (isFraud) {
+                resultLabel.textContent = '⚠️ This message is FRAUDULENT.';
+                resultLabel.classList.remove('text-green-600');
+                resultLabel.classList.add('text-red-600');
+                resultDescription.textContent = "This message contains keywords commonly found in spam or phishing attempts. Please be cautious.";
+            } else {
+                resultLabel.textContent = '✅ This message is LEGITIMATE.';
+                resultLabel.classList.remove('text-red-600');
+                resultLabel.classList.add('text-green-600');
+                resultDescription.textContent = "This message does not appear to be fraudulent based on our analysis.";
+            }
+        }
+
+        // Add the click event listener to the button.
+        checkButton.addEventListener('click', handleCheck);
+    </script>
+</body>
+</html>
